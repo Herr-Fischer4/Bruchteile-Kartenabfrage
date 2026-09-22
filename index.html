@@ -11,6 +11,7 @@
     href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
   >
 
+  <!-- Die Reihenfolge der defer-Skripte ist wichtig. -->
   <script
     defer
     src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
@@ -24,7 +25,7 @@
   <style>
     :root {
       --blue: #2563eb;
-      --blue-dark: #1e40af;
+      --blue-dark: #1d4ed8;
       --blue-light: #eff6ff;
       --green: #15803d;
       --green-light: #f0fdf4;
@@ -46,7 +47,11 @@
       min-height: 100vh;
       background: var(--slate-100);
       color: var(--slate-900);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         sans-serif;
     }
 
@@ -61,8 +66,8 @@
     }
 
     header {
-      text-align: center;
       margin-bottom: 1.5rem;
+      text-align: center;
     }
 
     h1 {
@@ -85,10 +90,10 @@
       display: flex;
       justify-content: space-between;
       gap: 1rem;
+      margin-bottom: 0.45rem;
       color: var(--slate-500);
       font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 0.45rem;
     }
 
     .progress-bar {
@@ -100,8 +105,8 @@
     }
 
     .progress-value {
-      height: 100%;
       width: 5%;
+      height: 100%;
       border-radius: inherit;
       background: var(--blue);
       transition: width 250ms ease;
@@ -113,9 +118,9 @@
       flex-direction: column;
       justify-content: space-between;
       padding: clamp(1.25rem, 4vw, 2rem);
-      background: var(--white);
       border: 1px solid var(--slate-200);
       border-radius: 1.25rem;
+      background: var(--white);
       box-shadow: 0 12px 30px rgb(15 23 42 / 10%);
     }
 
@@ -147,8 +152,8 @@
       flex: 1;
       flex-direction: column;
       justify-content: center;
-      text-align: center;
       padding: 2rem 0.25rem;
+      text-align: center;
     }
 
     .question {
@@ -160,8 +165,8 @@
 
     .answer {
       display: none;
-      margin: 1.5rem auto 0;
       width: min(100%, 580px);
+      margin: 1.5rem auto 0;
       padding: 1rem;
       border: 1px solid #bbf7d0;
       border-radius: 0.9rem;
@@ -187,6 +192,7 @@
       margin: 0;
       color: var(--slate-500);
       font-size: 0.85rem;
+      text-align: center;
     }
 
     .show-answer {
@@ -198,7 +204,9 @@
       color: var(--white);
       font-weight: 700;
       cursor: pointer;
-      transition: background 150ms ease, transform 150ms ease;
+      transition:
+        background 150ms ease,
+        transform 150ms ease;
     }
 
     .show-answer:hover {
@@ -230,7 +238,9 @@
       color: var(--slate-700);
       font-weight: 700;
       cursor: pointer;
-      transition: background 150ms ease, opacity 150ms ease;
+      transition:
+        background 150ms ease,
+        opacity 150ms ease;
     }
 
     .navigation button:hover:not(:disabled) {
@@ -324,7 +334,13 @@
         </div>
       </div>
 
-      <button id="show-answer" class="show-answer" type="button">
+      <button
+        id="show-answer"
+        class="show-answer"
+        type="button"
+        aria-expanded="false"
+        aria-controls="answer"
+      >
         Lösung anzeigen
       </button>
 
@@ -348,7 +364,11 @@
     </p>
   </main>
 
-  <script>
+  <!--
+    Dieses Skript steht ebenfalls auf "defer" und wird deshalb
+    nach KaTeX und auto-render ausgeführt.
+  -->
+  <script defer>
     const cards = [
       {
         level: "Grundlagen",
@@ -366,6 +386,7 @@
           <strong>Antwort: Sie haben $9\text{ km}$ zurückgelegt.</strong>
         `
       },
+
       {
         level: "Grundlagen",
         difficulty: "Stufe 1",
@@ -377,6 +398,7 @@
           <strong>Antwort: $\frac{2}{5}$ von $35$ sind $14$.</strong>
         `
       },
+
       {
         level: "Grundlagen",
         difficulty: "Stufe 1",
@@ -388,6 +410,7 @@
           <strong>Antwort: $\frac{5}{8}$ von $24$ sind $15$.</strong>
         `
       },
+
       {
         level: "Grundlagen",
         difficulty: "Stufe 1",
@@ -401,6 +424,7 @@
           <strong>Antwort: Ben isst $60\text{ g}$.</strong>
         `
       },
+
       {
         level: "Grundlagen",
         difficulty: "Stufe 1",
@@ -412,6 +436,7 @@
           <strong>Antwort: $\frac{7}{9}$ von $45\text{ m}$ sind $35\text{ m}$.</strong>
         `
       },
+
       {
         level: "Sicher rechnen",
         difficulty: "Stufe 2",
@@ -423,6 +448,7 @@
           <strong>Antwort: Das Ergebnis ist $32$.</strong>
         `
       },
+
       {
         level: "Sicher rechnen",
         difficulty: "Stufe 2",
@@ -436,6 +462,7 @@
           <strong>Antwort: Es sind $35$ rote Äpfel.</strong>
         `
       },
+
       {
         level: "Sicher rechnen",
         difficulty: "Stufe 2",
@@ -447,6 +474,7 @@
           <strong>Antwort: $\frac{3}{8}$ von $64\text{ €}$ sind $24\text{ €}$.</strong>
         `
       },
+
       {
         level: "Sicher rechnen",
         difficulty: "Stufe 2",
@@ -458,6 +486,7 @@
           <strong>Antwort: Das Ergebnis ist $28$.</strong>
         `
       },
+
       {
         level: "Sicher rechnen",
         difficulty: "Stufe 2",
@@ -471,6 +500,7 @@
           <strong>Antwort: Es werden $45\text{ l}$ verbraucht.</strong>
         `
       },
+
       {
         level: "Sachaufgaben",
         difficulty: "Stufe 3",
@@ -485,6 +515,7 @@
           <strong>Antwort: $16$ Murmeln sind nicht blau.</strong>
         `
       },
+
       {
         level: "Sachaufgaben",
         difficulty: "Stufe 3",
@@ -499,6 +530,7 @@
           <strong>Antwort: $45$ Bücher bleiben auf dem Wagen.</strong>
         `
       },
+
       {
         level: "Sachaufgaben",
         difficulty: "Stufe 3",
@@ -513,6 +545,7 @@
           <strong>Antwort: $7$ Kinder spielen keinen Fußball.</strong>
         `
       },
+
       {
         level: "Sachaufgaben",
         difficulty: "Stufe 3",
@@ -527,6 +560,7 @@
           <strong>Antwort: Lara muss noch $12$ Seiten lesen.</strong>
         `
       },
+
       {
         level: "Mehrere Schritte",
         difficulty: "Stufe 4",
@@ -542,6 +576,7 @@
           <strong>Antwort: Es werden $12\text{ l}$ zurückgefüllt.</strong>
         `
       },
+
       {
         level: "Mehrere Schritte",
         difficulty: "Stufe 4",
@@ -557,6 +592,7 @@
           <strong>Antwort: Es werden $24$ Buchen gepflanzt.</strong>
         `
       },
+
       {
         level: "Umkehraufgaben",
         difficulty: "Stufe 5",
@@ -565,12 +601,12 @@
           Wie lang ist die gesamte Strecke?
         `,
         answer: String.raw`
-          Wenn drei Viertel $18\text{ km}$ sind, ist ein Viertel
-          $18 : 3 = 6\text{ km}$ lang.
+          Ein Viertel ist $18 : 3 = 6\text{ km}$ lang.
           Die ganze Strecke ist $6 \cdot 4 = 24\text{ km}$ lang.
           <strong>Antwort: Die Strecke ist $24\text{ km}$ lang.</strong>
         `
       },
+
       {
         level: "Umkehraufgaben",
         difficulty: "Stufe 5",
@@ -584,6 +620,7 @@
           <strong>Antwort: Die Zahl ist $30$.</strong>
         `
       },
+
       {
         level: "Profi-Aufgabe",
         difficulty: "Stufe 6",
@@ -591,11 +628,12 @@
           Berechne $\frac{2}{5}$ von $\frac{3}{4}$ von $80$.
         `,
         answer: String.raw`
-          Zuerst: $\frac{3}{4}$ von $80$ sind $60$.
-          Danach: $\frac{2}{5}$ von $60$ sind $24$.
+          $\frac{3}{4}$ von $80$ sind $60$.
+          $\frac{2}{5}$ von $60$ sind $24$.
           <strong>Antwort: Das Ergebnis ist $24$.</strong>
         `
       },
+
       {
         level: "Profi-Aufgabe",
         difficulty: "Stufe 6",
@@ -609,7 +647,10 @@
           Ein Achtel ist $45 : 5 = 9\text{ km}$.
           Gesamtstrecke: $9 \cdot 8 = 72\text{ km}$.
           Geschafft: $72 : 8 \cdot 3 = 27\text{ km}$.
-          <strong>Antwort: Die Strecke ist $72\text{ km}$ lang; geschafft sind $27\text{ km}$.</strong>
+          <strong>
+            Antwort: Die Strecke ist $72\text{ km}$ lang;
+            geschafft sind $27\text{ km}$.
+          </strong>
         `
       }
     ];
@@ -630,50 +671,80 @@
     const progressElement = document.querySelector("#progress");
     const progressBar = document.querySelector(".progress-bar");
 
-    function renderMath() {
-      renderMathInElement(document.body, {
+    function renderMathInElementSafely(element) {
+      if (
+        !element ||
+        typeof window.renderMathInElement !== "function"
+      ) {
+        return;
+      }
+
+      window.renderMathInElement(element, {
         delimiters: [
-          { left: "$$", right: "$$", display: true },
-          { left: "$", right: "$", display: false }
+          {
+            left: "$$",
+            right: "$$",
+            display: true
+          },
+          {
+            left: "$",
+            right: "$",
+            display: false
+          }
         ],
         throwOnError: false
       });
     }
 
     function renderCard() {
-      const card = cards[currentIndex];
+      const currentCard = cards[currentIndex];
 
       answerVisible = false;
       answerElement.classList.remove("visible");
+
       showAnswerButton.textContent = "Lösung anzeigen";
       showAnswerButton.setAttribute("aria-expanded", "false");
 
-      levelElement.textContent = card.level;
-      difficultyElement.textContent = card.difficulty;
+      levelElement.textContent = currentCard.level;
+      difficultyElement.textContent = currentCard.difficulty;
+
       counterElement.textContent =
         `Karte ${currentIndex + 1} von ${cards.length}`;
-      cardNumberElement.textContent = `Karte ${currentIndex + 1}`;
 
-      questionElement.innerHTML = card.question;
-      answerTextElement.innerHTML = card.answer;
+      cardNumberElement.textContent =
+        `Karte ${currentIndex + 1}`;
+
+      /*
+       * Die Inhalte werden zunächst neu eingesetzt.
+       * Danach rendert KaTeX nur die beiden betroffenen Bereiche.
+       */
+      questionElement.innerHTML = currentCard.question;
+      answerTextElement.innerHTML = currentCard.answer;
+
+      renderMathInElementSafely(questionElement);
+      renderMathInElementSafely(answerTextElement);
 
       const progress = ((currentIndex + 1) / cards.length) * 100;
+
       progressElement.style.width = `${progress}%`;
-      progressBar.setAttribute("aria-valuenow", currentIndex + 1);
+      progressBar.setAttribute(
+        "aria-valuenow",
+        String(currentIndex + 1)
+      );
 
       previousButton.disabled = currentIndex === 0;
+
       nextButton.textContent =
         currentIndex === cards.length - 1
           ? "Von vorne beginnen"
           : "Nächste Karte →";
-
-      renderMath();
     }
 
     function toggleAnswer() {
       answerVisible = !answerVisible;
 
       answerElement.classList.toggle("visible", answerVisible);
+
       showAnswerButton.textContent = answerVisible
         ? "Lösung verbergen"
         : "Lösung anzeigen";
@@ -719,6 +790,12 @@
       }
     });
 
+    /*
+     * Wichtig:
+     * Dieses Skript besitzt ebenfalls "defer" und wird deshalb
+     * nach den beiden KaTeX-Skripten ausgeführt.
+     * Dadurch wird die erste Karte sofort korrekt gerendert.
+     */
     renderCard();
   </script>
 </body>
