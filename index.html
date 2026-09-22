@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Bruchteile berechnen – Kartenabfrage</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+  >
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+  ></script>
+
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  ></script>
+
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1e40af;
+      --blue-light: #eff6ff;
+      --green: #15803d;
+      --green-light: #f0fdf4;
+      --slate-900: #0f172a;
+      --slate-700: #334155;
+      --slate-500: #64748b;
+      --slate-300: #cbd5e1;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--slate-100);
+      color: var(--slate-900);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .app {
+      width: min(100% - 2rem, 760px);
+      margin: 0 auto;
+      padding: 2rem 0;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 0.5rem 0 0;
+      color: var(--slate-500);
+      font-size: 0.95rem;
+    }
+
+    .progress-area {
+      margin-bottom: 1rem;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      color: var(--slate-500);
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.45rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 0.55rem;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--slate-200);
+    }
+
+    .progress-value {
+      height: 100%;
+      width: 5%;
+      border-radius: inherit;
+      background: var(--blue);
+      transition: width 250ms ease;
+    }
+
+    .card {
+      min-height: 430px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(1.25rem, 4vw, 2rem);
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: 1.25rem;
+      box-shadow: 0 12px 30px rgb(15 23 42 / 10%);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .level {
+      display: inline-block;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .card-number {
+      color: var(--slate-500);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .question-area {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 0.25rem;
+    }
+
+    .question {
+      margin: 0;
+      color: var(--slate-900);
+      font-size: clamp(1.15rem, 3vw, 1.45rem);
+      line-height: 1.6;
+    }
+
+    .answer {
+      display: none;
+      margin: 1.5rem auto 0;
+      width: min(100%, 580px);
+      padding: 1rem;
+      border: 1px solid #bbf7d0;
+      border-radius: 0.9rem;
+      background: var(--green-light);
+      color: #14532d;
+      line-height: 1.6;
+    }
+
+    .answer.visible {
+      display: block;
+    }
+
+    .answer-title {
+      margin: 0 0 0.35rem;
+      font-weight: 800;
+    }
+
+    .answer-text {
+      margin: 0;
+    }
+
+    .card-hint {
+      margin: 0;
+      color: var(--slate-500);
+      font-size: 0.85rem;
+    }
+
+    .show-answer {
+      align-self: center;
+      border: 0;
+      border-radius: 0.75rem;
+      padding: 0.8rem 1.2rem;
+      background: var(--blue);
+      color: var(--white);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 150ms ease, transform 150ms ease;
+    }
+
+    .show-answer:hover {
+      background: var(--blue-dark);
+    }
+
+    .show-answer:active {
+      transform: scale(0.98);
+    }
+
+    .show-answer:focus-visible,
+    .navigation button:focus-visible {
+      outline: 4px solid #bfdbfe;
+      outline-offset: 2px;
+    }
+
+    .navigation {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .navigation button {
+      border: 1px solid var(--slate-300);
+      border-radius: 0.75rem;
+      padding: 0.8rem 1rem;
+      background: var(--white);
+      color: var(--slate-700);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 150ms ease, opacity 150ms ease;
+    }
+
+    .navigation button:hover:not(:disabled) {
+      background: var(--slate-100);
+    }
+
+    .navigation button:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    .keyboard-help {
+      margin: 1rem 0 0;
+      color: var(--slate-500);
+      text-align: center;
+      font-size: 0.8rem;
+    }
+
+    .katex-display {
+      margin: 0.6rem 0;
+    }
+
+    @media (max-width: 480px) {
+      .app {
+        width: min(100% - 1rem, 760px);
+        padding: 1rem 0;
+      }
+
+      .card {
+        min-height: 470px;
+      }
+
+      .progress-info {
+        font-size: 0.8rem;
+      }
+
+      .navigation {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .progress-value,
+      .show-answer,
+      .navigation button {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <h1>Bruchteile berechnen</h1>
+      <p class="subtitle">
+        Kartenabfrage für die 6. Klasse
+      </p>
+    </header>
+
+    <section class="progress-area" aria-label="Lernfortschritt">
+      <div class="progress-info">
+        <span id="level">Grundlagen</span>
+        <span id="counter">Karte 1 von 20</span>
+      </div>
+
+      <div
+        class="progress-bar"
+        role="progressbar"
+        aria-valuemin="1"
+        aria-valuemax="20"
+        aria-valuenow="1"
+        aria-label="Fortschritt"
+      >
+        <div id="progress" class="progress-value"></div>
+      </div>
+    </section>
+
+    <article class="card" aria-live="polite">
+      <div class="card-top">
+        <span id="difficulty" class="level">Stufe 1</span>
+        <span id="card-number" class="card-number">Karte 1</span>
+      </div>
+
+      <div class="question-area">
+        <p id="question" class="question"></p>
+
+        <div id="answer" class="answer">
+          <p class="answer-title">Lösung</p>
+          <p id="answer-text" class="answer-text"></p>
+        </div>
+      </div>
+
+      <button id="show-answer" class="show-answer" type="button">
+        Lösung anzeigen
+      </button>
+
+      <p class="card-hint">
+        Überlege zuerst selbst und prüfe anschließend deine Lösung.
+      </p>
+    </article>
+
+    <nav class="navigation" aria-label="Karten-Navigation">
+      <button id="previous" type="button">
+        ← Zurück
+      </button>
+
+      <button id="next" type="button">
+        Nächste Karte →
+      </button>
+    </nav>
+
+    <p class="keyboard-help">
+      Tastatur: ← und → zum Blättern, Leertaste zum Anzeigen der Lösung
+    </p>
+  </main>
+
+  <script>
+    const cards = [
+      {
+        level: "Grundlagen",
+        difficulty: "Stufe 1",
+        question: String.raw`
+          Mia und Ben planen eine Fahrradtour an den See.
+          Die gesamte Strecke ist $12\text{ km}$ lang.
+          Sie teilen die Strecke in $4$ gleich lange Abschnitte ein.
+          Sie haben $\frac{3}{4}$ der Strecke geschafft.
+          Wie viele Kilometer haben sie bereits zurückgelegt?
+        `,
+        answer: String.raw`
+          Ein Viertel: $12 : 4 = 3\text{ km}$.
+          Drei Viertel: $3 \cdot 3 = 9\text{ km}$.
+          <strong>Antwort: Sie haben $9\text{ km}$ zurückgelegt.</strong>
+        `
+      },
+      {
+        level: "Grundlagen",
+        difficulty: "Stufe 1",
+        question: String.raw`
+          Berechne $\frac{2}{5}$ von $35$.
+        `,
+        answer: String.raw`
+          $35 : 5 = 7$ und $7 \cdot 2 = 14$.
+          <strong>Antwort: $\frac{2}{5}$ von $35$ sind $14$.</strong>
+        `
+      },
+      {
+        level: "Grundlagen",
+        difficulty: "Stufe 1",
+        question: String.raw`
+          Berechne $\frac{5}{8}$ von $24$.
+        `,
+        answer: String.raw`
+          $24 : 8 = 3$ und $3 \cdot 5 = 15$.
+          <strong>Antwort: $\frac{5}{8}$ von $24$ sind $15$.</strong>
+        `
+      },
+      {
+        level: "Grundlagen",
+        difficulty: "Stufe 1",
+        question: String.raw`
+          Eine Tafel Schokolade wiegt $200\text{ g}$.
+          Ben isst $\frac{3}{10}$ davon.
+          Wie viel Gramm isst Ben?
+        `,
+        answer: String.raw`
+          $200 : 10 = 20$ und $20 \cdot 3 = 60$.
+          <strong>Antwort: Ben isst $60\text{ g}$.</strong>
+        `
+      },
+      {
+        level: "Grundlagen",
+        difficulty: "Stufe 1",
+        question: String.raw`
+          Berechne $\frac{7}{9}$ von $45\text{ m}$.
+        `,
+        answer: String.raw`
+          $45 : 9 = 5$ und $5 \cdot 7 = 35$.
+          <strong>Antwort: $\frac{7}{9}$ von $45\text{ m}$ sind $35\text{ m}$.</strong>
+        `
+      },
+      {
+        level: "Sicher rechnen",
+        difficulty: "Stufe 2",
+        question: String.raw`
+          Berechne $\frac{4}{7}$ von $56$.
+        `,
+        answer: String.raw`
+          $56 : 7 = 8$ und $8 \cdot 4 = 32$.
+          <strong>Antwort: Das Ergebnis ist $32$.</strong>
+        `
+      },
+      {
+        level: "Sicher rechnen",
+        difficulty: "Stufe 2",
+        question: String.raw`
+          In einem Korb liegen $42$ Äpfel.
+          $\frac{5}{6}$ davon sind rote Äpfel.
+          Wie viele rote Äpfel liegen im Korb?
+        `,
+        answer: String.raw`
+          $42 : 6 = 7$ und $7 \cdot 5 = 35$.
+          <strong>Antwort: Es sind $35$ rote Äpfel.</strong>
+        `
+      },
+      {
+        level: "Sicher rechnen",
+        difficulty: "Stufe 2",
+        question: String.raw`
+          Berechne $\frac{3}{8}$ von $64\text{ €}$.
+        `,
+        answer: String.raw`
+          $64 : 8 = 8$ und $8 \cdot 3 = 24$.
+          <strong>Antwort: $\frac{3}{8}$ von $64\text{ €}$ sind $24\text{ €}$.</strong>
+        `
+      },
+      {
+        level: "Sicher rechnen",
+        difficulty: "Stufe 2",
+        question: String.raw`
+          Berechne $\frac{7}{12}$ von $48$.
+        `,
+        answer: String.raw`
+          $48 : 12 = 4$ und $4 \cdot 7 = 28$.
+          <strong>Antwort: Das Ergebnis ist $28$.</strong>
+        `
+      },
+      {
+        level: "Sicher rechnen",
+        difficulty: "Stufe 2",
+        question: String.raw`
+          Ein Kanister enthält $81\text{ l}$ Wasser.
+          $\frac{5}{9}$ davon werden verbraucht.
+          Wie viele Liter sind das?
+        `,
+        answer: String.raw`
+          $81 : 9 = 9$ und $9 \cdot 5 = 45$.
+          <strong>Antwort: Es werden $45\text{ l}$ verbraucht.</strong>
+        `
+      },
+      {
+        level: "Sachaufgaben",
+        difficulty: "Stufe 3",
+        question: String.raw`
+          In einem Glas sind $40$ Murmeln.
+          $\frac{3}{5}$ davon sind blau.
+          Wie viele Murmeln sind nicht blau?
+        `,
+        answer: String.raw`
+          Blau: $40 : 5 \cdot 3 = 24$.
+          Nicht blau: $40 - 24 = 16$.
+          <strong>Antwort: $16$ Murmeln sind nicht blau.</strong>
+        `
+      },
+      {
+        level: "Sachaufgaben",
+        difficulty: "Stufe 3",
+        question: String.raw`
+          In einer Bücherei stehen $63$ Bücher auf einem Wagen.
+          $\frac{2}{7}$ davon werden ausgeliehen.
+          Wie viele Bücher bleiben auf dem Wagen?
+        `,
+        answer: String.raw`
+          Ausgeliehen: $63 : 7 \cdot 2 = 18$.
+          Übrig: $63 - 18 = 45$.
+          <strong>Antwort: $45$ Bücher bleiben auf dem Wagen.</strong>
+        `
+      },
+      {
+        level: "Sachaufgaben",
+        difficulty: "Stufe 3",
+        question: String.raw`
+          In einer Klasse sind $28$ Kinder.
+          $\frac{3}{4}$ der Kinder spielen Fußball.
+          Wie viele Kinder spielen keinen Fußball?
+        `,
+        answer: String.raw`
+          Fußball: $28 : 4 \cdot 3 = 21$.
+          Kein Fußball: $28 - 21 = 7$.
+          <strong>Antwort: $7$ Kinder spielen keinen Fußball.</strong>
+        `
+      },
+      {
+        level: "Sachaufgaben",
+        difficulty: "Stufe 3",
+        question: String.raw`
+          Ein Buch hat $32$ Seiten.
+          Lara liest $\frac{5}{8}$ des Buches.
+          Wie viele Seiten muss sie noch lesen?
+        `,
+        answer: String.raw`
+          Gelesen: $32 : 8 \cdot 5 = 20$.
+          Noch zu lesen: $32 - 20 = 12$.
+          <strong>Antwort: Lara muss noch $12$ Seiten lesen.</strong>
+        `
+      },
+      {
+        level: "Mehrere Schritte",
+        difficulty: "Stufe 4",
+        question: String.raw`
+          Ein Tank ist mit $24\text{ l}$ gefüllt.
+          Zuerst werden $\frac{3}{4}$ des Wassers verwendet.
+          Danach wird $\frac{2}{3}$ der verwendeten Menge zurückgefüllt.
+          Wie viele Liter werden zurückgefüllt?
+        `,
+        answer: String.raw`
+          Verwendet: $24 : 4 \cdot 3 = 18\text{ l}$.
+          Zurückgefüllt: $18 : 3 \cdot 2 = 12\text{ l}$.
+          <strong>Antwort: Es werden $12\text{ l}$ zurückgefüllt.</strong>
+        `
+      },
+      {
+        level: "Mehrere Schritte",
+        difficulty: "Stufe 4",
+        question: String.raw`
+          In einer Schule werden $60$ Bäume gepflanzt.
+          $\frac{2}{3}$ davon sind Laubbäume.
+          Von den Laubbäumen sind $\frac{3}{5}$ Buchen.
+          Wie viele Buchen werden gepflanzt?
+        `,
+        answer: String.raw`
+          Laubbäume: $60 : 3 \cdot 2 = 40$.
+          Buchen: $40 : 5 \cdot 3 = 24$.
+          <strong>Antwort: Es werden $24$ Buchen gepflanzt.</strong>
+        `
+      },
+      {
+        level: "Umkehraufgaben",
+        difficulty: "Stufe 5",
+        question: String.raw`
+          $\frac{3}{4}$ einer Strecke sind $18\text{ km}$.
+          Wie lang ist die gesamte Strecke?
+        `,
+        answer: String.raw`
+          Wenn drei Viertel $18\text{ km}$ sind, ist ein Viertel
+          $18 : 3 = 6\text{ km}$ lang.
+          Die ganze Strecke ist $6 \cdot 4 = 24\text{ km}$ lang.
+          <strong>Antwort: Die Strecke ist $24\text{ km}$ lang.</strong>
+        `
+      },
+      {
+        level: "Umkehraufgaben",
+        difficulty: "Stufe 5",
+        question: String.raw`
+          $\frac{5}{6}$ einer Zahl sind $25$.
+          Wie groß ist die ganze Zahl?
+        `,
+        answer: String.raw`
+          Ein Sechstel ist $25 : 5 = 5$.
+          Die ganze Zahl ist $5 \cdot 6 = 30$.
+          <strong>Antwort: Die Zahl ist $30$.</strong>
+        `
+      },
+      {
+        level: "Profi-Aufgabe",
+        difficulty: "Stufe 6",
+        question: String.raw`
+          Berechne $\frac{2}{5}$ von $\frac{3}{4}$ von $80$.
+        `,
+        answer: String.raw`
+          Zuerst: $\frac{3}{4}$ von $80$ sind $60$.
+          Danach: $\frac{2}{5}$ von $60$ sind $24$.
+          <strong>Antwort: Das Ergebnis ist $24$.</strong>
+        `
+      },
+      {
+        level: "Profi-Aufgabe",
+        difficulty: "Stufe 6",
+        question: String.raw`
+          Von einer Strecke sind $\frac{3}{8}$ bereits geschafft.
+          Der Rest beträgt $45\text{ km}$.
+          Wie lang ist die gesamte Strecke und wie viele Kilometer sind bereits geschafft?
+        `,
+        answer: String.raw`
+          Der Rest entspricht $\frac{5}{8}$.
+          Ein Achtel ist $45 : 5 = 9\text{ km}$.
+          Gesamtstrecke: $9 \cdot 8 = 72\text{ km}$.
+          Geschafft: $72 : 8 \cdot 3 = 27\text{ km}$.
+          <strong>Antwort: Die Strecke ist $72\text{ km}$ lang; geschafft sind $27\text{ km}$.</strong>
+        `
+      }
+    ];
+
+    let currentIndex = 0;
+    let answerVisible = false;
+
+    const questionElement = document.querySelector("#question");
+    const answerElement = document.querySelector("#answer");
+    const answerTextElement = document.querySelector("#answer-text");
+    const showAnswerButton = document.querySelector("#show-answer");
+    const previousButton = document.querySelector("#previous");
+    const nextButton = document.querySelector("#next");
+    const levelElement = document.querySelector("#level");
+    const difficultyElement = document.querySelector("#difficulty");
+    const counterElement = document.querySelector("#counter");
+    const cardNumberElement = document.querySelector("#card-number");
+    const progressElement = document.querySelector("#progress");
+    const progressBar = document.querySelector(".progress-bar");
+
+    function renderMath() {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      });
+    }
+
+    function renderCard() {
+      const card = cards[currentIndex];
+
+      answerVisible = false;
+      answerElement.classList.remove("visible");
+      showAnswerButton.textContent = "Lösung anzeigen";
+      showAnswerButton.setAttribute("aria-expanded", "false");
+
+      levelElement.textContent = card.level;
+      difficultyElement.textContent = card.difficulty;
+      counterElement.textContent =
+        `Karte ${currentIndex + 1} von ${cards.length}`;
+      cardNumberElement.textContent = `Karte ${currentIndex + 1}`;
+
+      questionElement.innerHTML = card.question;
+      answerTextElement.innerHTML = card.answer;
+
+      const progress = ((currentIndex + 1) / cards.length) * 100;
+      progressElement.style.width = `${progress}%`;
+      progressBar.setAttribute("aria-valuenow", currentIndex + 1);
+
+      previousButton.disabled = currentIndex === 0;
+      nextButton.textContent =
+        currentIndex === cards.length - 1
+          ? "Von vorne beginnen"
+          : "Nächste Karte →";
+
+      renderMath();
+    }
+
+    function toggleAnswer() {
+      answerVisible = !answerVisible;
+
+      answerElement.classList.toggle("visible", answerVisible);
+      showAnswerButton.textContent = answerVisible
+        ? "Lösung verbergen"
+        : "Lösung anzeigen";
+
+      showAnswerButton.setAttribute(
+        "aria-expanded",
+        String(answerVisible)
+      );
+    }
+
+    function nextCard() {
+      currentIndex =
+        currentIndex < cards.length - 1
+          ? currentIndex + 1
+          : 0;
+
+      renderCard();
+    }
+
+    function previousCard() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCard();
+      }
+    }
+
+    showAnswerButton.addEventListener("click", toggleAnswer);
+    nextButton.addEventListener("click", nextCard);
+    previousButton.addEventListener("click", previousCard);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") {
+        nextCard();
+      }
+
+      if (event.key === "ArrowLeft") {
+        previousCard();
+      }
+
+      if (event.key === " ") {
+        event.preventDefault();
+        toggleAnswer();
+      }
+    });
+
+    renderCard();
+  </script>
+</body>
+</html>
